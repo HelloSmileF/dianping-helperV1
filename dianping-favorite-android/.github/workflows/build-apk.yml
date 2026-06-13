@@ -1,0 +1,35 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 设置 JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 设置 Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: 构建 Debug APK
+        working-directory: dianping-favorite-android
+        run: ./gradlew assembleDebug --build-cache --parallel
+
+      - name: 上传 APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DianpingHelper-v1.0-debug
+          path: dianping-favorite-android/app/build/outputs/apk/debug/*.apk
+          retention-days: 30
